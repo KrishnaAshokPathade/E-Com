@@ -2,6 +2,8 @@ package com.backend.service.serviceImpl;
 
 import com.backend.exception.BadApiRequest;
 import com.backend.service.FileService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,6 +14,7 @@ import java.util.UUID;
 
 @Service
 public class FileServiceImpl implements FileService {
+    private Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
 
     @Override
     public String uploadFile(MultipartFile file, String path) throws IOException {
@@ -23,8 +26,8 @@ public class FileServiceImpl implements FileService {
         String fileNameWithExtension = fileName + extension;
 
         String FullPathWithFileName = path + fileNameWithExtension;
-        if (extension.equalsIgnoreCase("JPG")||extension.equalsIgnoreCase("png") || extension.equalsIgnoreCase("jpg") || extension.equalsIgnoreCase("jpeg")) {
-// file save
+        if (extension.equalsIgnoreCase(".JPG") || extension.equalsIgnoreCase(".png") || extension.equalsIgnoreCase(".jpg") || extension.equalsIgnoreCase(".jpeg")) {
+            // file save
 
             File folder = new File(path);
             if (!folder.exists()) {

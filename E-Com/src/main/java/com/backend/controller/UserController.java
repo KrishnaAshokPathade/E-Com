@@ -87,21 +87,23 @@ public class UserController {
 
         String imageName = this.fileService.uploadFile(image, imageUploadPath);
         UserDto user = this.userService.getUserById(userId);
-        user.setUserId(imageName);
+        //  user.setUserId(imageName);
+        user.setImageName(imageName);
         userService.updateUser(user, userId);
 
-        ImageResponce imageResponce = ImageResponce.builder().imageName(imageName).success(true).build();
+        ImageResponce imageResponce = ImageResponce.builder().imageName(imageName).success(true).status("Success").message("Upload Image Successfully").build();
         return new ResponseEntity<ImageResponce>(imageResponce, HttpStatus.CREATED);
 
 
     }
+
     // serve user Image
     @GetMapping("/image/{userId}")
-    public void serveUserImage(@PathVariable String userId, HttpServletResponse responce) throws Exception {
+    public ResponseEntity<?> serveUserImage(@PathVariable String userId, HttpServletResponse responce) throws Exception {
         UserDto user = userService.getUserById(userId);
         InputStream resource = fileService.getResource(imageUploadPath, user.getImageName());
         responce.setContentType(MediaType.IMAGE_JPEG_VALUE);
-        StreamUtils.copy(resource,responce.getOutputStream());
-
+        StreamUtils.copy(resource, responce.getOutputStream());
+        return ResponseEntity.ok("Get User Image Successfully");
     }
 }
