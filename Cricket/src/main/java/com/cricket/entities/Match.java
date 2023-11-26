@@ -27,10 +27,10 @@ public class Match {
 
     private String textComplete;
     @Enumerated
-    private MatchStatus status;
+    private MatchStatus matchStatus;
     private Date date = new Date();
 
-    public Match(int matchId, String teamHeading, String matchNumberVersion, String battingTeam, String battingTeamScore, String bowlTeam, String liveText, String matchLink, String textComplete, MatchStatus status, Date date) {
+    public Match(int matchId, String teamHeading, String matchNumberVersion, String battingTeam, String battingTeamScore, String bowlTeam, String liveText, String matchLink, String textComplete, MatchStatus matchStatus, Date date) {
         this.matchId = matchId;
         this.teamHeading = teamHeading;
         this.matchNumberVersion = matchNumberVersion;
@@ -40,7 +40,7 @@ public class Match {
         this.liveText = liveText;
         this.matchLink = matchLink;
         this.textComplete = textComplete;
-        this.status = status;
+        this.matchStatus = matchStatus;
         this.date = date;
     }
 
@@ -61,8 +61,11 @@ public class Match {
                 ", liveText='" + liveText + '\'' +
                 ", matchLink='" + matchLink + '\'' +
                 ", textComplete='" + textComplete + '\'' +
-                ", status=" + status +
+                ", status=" + matchStatus +
                 ", date=" + date +
                 '}';
+
     }
 }
+
+

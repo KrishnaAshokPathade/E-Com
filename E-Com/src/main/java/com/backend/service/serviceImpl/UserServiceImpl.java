@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(UserDto userDto, String userId) {
-        User user = userRepo.findById(Integer.valueOf(userId)).orElseThrow(() -> new ResourceNotFoundException("User Not Found Exception !!"));
+        User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found Exception !!"));
 
         user.setAbout(userDto.getAbout());
         user.setName(userDto.getName());
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(String userId) {
-        User user = this.userRepo.findById(Integer.valueOf(userId)).orElseThrow(() -> new ResourceNotFoundException("User Not Found Exception"));
+        User user = this.userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found Exception"));
 
         this.userRepo.delete(user);
     }
@@ -82,14 +82,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(String userId) throws Exception {
-        User user = userRepo.findById(Integer.parseInt(userId)).orElseThrow(() -> new ResourceNotFoundException("UserId not Found "));
+        User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("UserId not Found "));
         return userToDto(user);
 
-    }
-
-    private boolean isValidUserId(String userId) {
-        // Add validation logic, e.g., regex or other checks
-        return userId.matches("\\d+"); // Matches one or more digits
     }
 
     @Override
