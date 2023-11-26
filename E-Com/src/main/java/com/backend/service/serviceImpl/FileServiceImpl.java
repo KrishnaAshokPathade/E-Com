@@ -9,6 +9,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
+
 @Service
 public class FileServiceImpl implements FileService {
 
@@ -21,8 +22,8 @@ public class FileServiceImpl implements FileService {
         String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         String fileNameWithExtension = fileName + extension;
 
-        String FullPathWithFileName = path + File.separator + fileNameWithExtension;
-        if (extension.equalsIgnoreCase("png") || extension.equalsIgnoreCase("jpg") || extension.equalsIgnoreCase("jpeg")) {
+        String FullPathWithFileName = path + fileNameWithExtension;
+        if (extension.equalsIgnoreCase("JPG")||extension.equalsIgnoreCase("png") || extension.equalsIgnoreCase("jpg") || extension.equalsIgnoreCase("jpeg")) {
 // file save
 
             File folder = new File(path);
@@ -41,7 +42,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public InputStream getResource(String path, String name) throws FileNotFoundException {
-        String fullPath = path  + name;
+        String fullPath = path + name;
 
         InputStream inputStream = new FileInputStream(fullPath);
         return inputStream;

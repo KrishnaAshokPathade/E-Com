@@ -22,4 +22,14 @@ public class ImageResponce {
         this.imageName = imageName;
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return "ImageResponce{" +
+                "message='" + message + '\'' +
+                ", success=" + success +
+                ", imageName='" + imageName + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }
