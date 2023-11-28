@@ -1,4 +1,4 @@
-package com.backend.controller.config;
+package com.backend.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

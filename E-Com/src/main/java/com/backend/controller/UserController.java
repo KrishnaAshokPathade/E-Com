@@ -29,7 +29,7 @@ public class UserController {
     private FileService fileService;
     @Autowired
     private UserService userService;
-    @Value("$(user.profile.image.path)")
+    @Value("${user.image}")
     private String imageUploadPath;
 
     @PostMapping("/createUser")
@@ -54,7 +54,6 @@ public class UserController {
 
     @DeleteMapping("/deleteUser/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable String userId) {
-
         this.userService.deleteUser((userId));
         return ResponseEntity.ok("Delete User Successfully");
     }

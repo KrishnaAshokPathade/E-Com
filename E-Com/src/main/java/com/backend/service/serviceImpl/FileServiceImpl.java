@@ -18,7 +18,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public String uploadFile(MultipartFile file, String path) throws IOException {
-
+        logger.info("uploadFile method is running started");
         String originalFilename = file.getOriginalFilename();
         String fileName = UUID.randomUUID().toString();
 
@@ -33,6 +33,7 @@ public class FileServiceImpl implements FileService {
             if (!folder.exists()) {
                 //create folder
                 folder.mkdirs();
+                folder.deleteOnExit();
             }
 
             Files.copy(file.getInputStream(), Paths.get(FullPathWithFileName));

@@ -42,8 +42,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadApiRequest.class)
     public ResponseEntity<ApiResponceMessage> badApiRequestHandle(BadApiRequest ex) {
         ApiResponceMessage responceMessage = ApiResponceMessage.builder().message(ex.getMessage()).success(false).build();
-        return
-                apiResponceMessageResponseEntity;
+        return apiResponceMessageResponseEntity;
     }
 
 }
