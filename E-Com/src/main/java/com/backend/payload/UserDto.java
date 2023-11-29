@@ -13,7 +13,6 @@ public class UserDto {
 
     private String userId;
     @Size(min=3,max = 30,message ="Invalid Name !!")
-
     private String name;
     @Email(message = "Invalid Email Id !!")
     @NotBlank(message = "Email should not blank")
