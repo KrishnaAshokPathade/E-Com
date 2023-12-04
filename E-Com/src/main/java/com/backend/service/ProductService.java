@@ -1,5 +1,6 @@
 package com.backend.service;
 
+import com.backend.payload.CategoryDto;
 import com.backend.payload.PagableResponce;
 import com.backend.payload.ProductDto;
 
@@ -21,4 +22,7 @@ public interface ProductService {
 
     PagableResponce<ProductDto> getAllByPageble(int pageNumber, int pageSize, String sortBy, String sortDir);
 
+    ProductDto createWithCategory(ProductDto productDto,String category);
+
+    ProductDto updateCategory(String productId, String categoryId);
 }

@@ -1,5 +1,6 @@
 package com.backend.payload;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +10,7 @@ import javax.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
+
 public class UserDto {
 
     private String userId;

@@ -1,5 +1,6 @@
 package com.backend.payload;
 
+import com.backend.model.Category;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,4 +36,5 @@ public class ProductDto {
     @NotBlank
     private String productImageName;
     //   private CategoryDto categoryDto;
+    private CategoryDto category;
 }

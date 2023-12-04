@@ -2,7 +2,9 @@ package com.backend.controller;
 
 import com.backend.payload.CategoryDto;
 import com.backend.payload.PagableResponce;
+import com.backend.payload.ProductDto;
 import com.backend.service.CategorySevice;
+import com.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,10 +12,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.PrimitiveIterator;
 
 @RestController
 @RequestMapping("/category/")
 public class CategoryController {
+    @Autowired
+    private ProductService productService;
     @Autowired
     private CategorySevice categorySevice;
 
@@ -51,4 +56,16 @@ public class CategoryController {
         return new ResponseEntity<PagableResponce<CategoryDto>>(all, HttpStatus.OK);
     }
 
+    @PostMapping("/{categoryId}/products")
+    public ResponseEntity<ProductDto> createProductWithCategory(@PathVariable String categoryId, @RequestBody ProductDto productDto) {
+        ProductDto productWithCategory = this.productService.createWithCategory(productDto, categoryId);
+
+        return new ResponseEntity<ProductDto>(productWithCategory, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{categoryId}/products/{productId}")
+    public ResponseEntity<ProductDto> updateCategoryOfProduct(@PathVariable String categoryId, @PathVariable String productId) {
+        ProductDto productDto = this.productService.updateCategory(categoryId, productId);
+        return new ResponseEntity<ProductDto>(productDto, HttpStatus.OK);
+    }
 }

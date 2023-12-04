@@ -1,17 +1,11 @@
 package com.backend.model;
 
-import com.backend.payload.CategoryDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import javax.persistence.*;
 import java.util.Date;
 
 @Data
@@ -38,7 +32,8 @@ public class Product {
     private boolean stock;
     @Column(name = "productImageName")
     private String productImageName;
-  //  @OneToMany
-  //  private CategoryDto categoryDto;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="Category_Id")
+    private Category category;
 
 }

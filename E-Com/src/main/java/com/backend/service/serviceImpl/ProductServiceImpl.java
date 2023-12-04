@@ -1,9 +1,11 @@
 package com.backend.service.serviceImpl;
 
 import com.backend.exception.ResourceNotFoundException;
+import com.backend.model.Category;
 import com.backend.model.Product;
 import com.backend.payload.PagableResponce;
 import com.backend.payload.ProductDto;
+import com.backend.repository.CategoryRepo;
 import com.backend.repository.ProductRepo;
 import com.backend.service.ProductService;
 import com.backend.utitlity.Helper;
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private CategoryRepo categoryRepo;
     @Autowired
     private ProductRepo productRepo;
 
@@ -89,5 +93,27 @@ public class ProductServiceImpl implements ProductService {
         PagableResponce<ProductDto> pagebleResponce = Helper.getPagebleResponce(products, ProductDto.class);
 
         return pagebleResponce;
+    }
+
+    @Override
+    public ProductDto createWithCategory(ProductDto productDto, String categoryId) {
+        Category category = this.categoryRepo.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("CategoryId Not Found"));
+        Product product = modelMapper.map(productDto, Product.class);
+        String productId = UUID.randomUUID().toString();
+        product.setProductId(productId);
+        product.setCategory(category);
+
+        Product saveUpdate = productRepo.save(product);
+        return this.modelMapper.map(saveUpdate, ProductDto.class);
+
+    }
+
+    @Override
+    public ProductDto updateCategory(String productId, String categoryId) {
+        Product product = this.productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("ProductId not Found for updateCategory"));
+        Category category = this.categoryRepo.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("CategoryId not Found for updateCategory !!"));
+        product.setCategory(category);
+        Product saveProduct = this.productRepo.save(product);
+        return modelMapper.map(product, ProductDto.class);
     }
 }

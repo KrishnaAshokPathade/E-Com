@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(UserDto userDto, String userId) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found Exception !!"));
+        User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("UserId Not Found !!"));
 
         user.setAbout(userDto.getAbout());
         user.setName(userDto.getName());
@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(String userId) {
-        User user = this.userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found Exception"));
+        User user = this.userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("UserId Not Found"));
         String fullpath = imagePath + user.getImageName();
 
         try {
@@ -123,7 +123,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserByEmail(String email) {
-        User user = userRepo.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not Found with given Email"));
+        User user = userRepo.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Email Not Found"));
 
         return userToDto(user);
     }
