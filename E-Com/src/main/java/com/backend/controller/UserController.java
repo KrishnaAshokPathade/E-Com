@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import static com.backend.constants.AppConstant.*;
+
 @RestController
 @RequestMapping("/user/")
 public class UserController {
@@ -34,8 +36,8 @@ public class UserController {
 
     @PostMapping("/createUser")
     public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
-        UserDto user = this.userService.createUser(userDto);
-        return new ResponseEntity<UserDto>(user, HttpStatus.CREATED);
+        UserDto dto = this.userService.createUser(userDto);
+        return new ResponseEntity<UserDto>(dto, HttpStatus.CREATED);
     }
 
     @PutMapping("/updateUser/{userId}")
@@ -60,10 +62,10 @@ public class UserController {
 
     @GetMapping("/getAllUser")
     public ResponseEntity<PagableResponce<UserDto>> getAllUser(
-            @RequestParam(value = "pageNumber", defaultValue = "1", required = false) int pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = "50", required = false) int pageSize,
-            @RequestParam(value = "sortBy", defaultValue = "name", required = false) String sortBy,
-            @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir
+            @RequestParam(value = "pageNumber", defaultValue = PAGE_NUMBER, required = false) int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = SORT_BY_NAME, required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = SORT_DIR, required = false) String sortDir
     ) {
 
         return new ResponseEntity<PagableResponce<UserDto>>(this.userService.getAll(pageNumber, pageSize, sortBy, sortDir), HttpStatus.OK);

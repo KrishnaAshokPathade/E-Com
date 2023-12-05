@@ -20,6 +20,8 @@ import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
+import static com.backend.constants.AppConstant.*;
+
 @RestController
 @RequestMapping("/products/")
 public class ProductController {
@@ -69,10 +71,10 @@ public class ProductController {
 
     @GetMapping("/getAllByPageble")
     public ResponseEntity<PagableResponce<ProductDto>> getAllByPageble(
-            @RequestParam(value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = "50", required = false) int pageSize,
-            @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir,
-            @RequestParam(value = "sortBy", defaultValue = "title", required = false) String sortBy) {
+            @RequestParam(value = "pageNumber", defaultValue = PAGE_NUMBER, required = false) int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortDir", defaultValue = SORT_DIR, required = false) String sortDir,
+            @RequestParam(value = "sortBy", defaultValue = SORT_BY_TITLE, required = false) String sortBy) {
         PagableResponce<ProductDto> all = this.productService.getAllByPageble(pageNumber, pageSize, sortBy, sortDir);
         return new ResponseEntity<PagableResponce<ProductDto>>(all, HttpStatus.OK);
     }

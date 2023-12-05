@@ -18,23 +18,14 @@ public class ProductDto {
     private String title;
     @NotBlank
     @Size(min = 3, max = 90, message = "Fill the desc of product !!")
-
     private String description;
-
-
     private int quantity;
-
     private int price;
     private int discountPrice;
-
-
     @JsonFormat(pattern = "dd/MM/yyyy")
-
     private Date addedDate;
-
     private boolean stock;
     @NotBlank
     private String productImageName;
-    //   private CategoryDto categoryDto;
     private CategoryDto category;
 }
