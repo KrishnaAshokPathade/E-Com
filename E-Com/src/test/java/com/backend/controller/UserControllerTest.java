@@ -1,6 +1,7 @@
 package com.backend.controller;
 
 import com.backend.model.User;
+import com.backend.payload.PagableResponce;
 import com.backend.payload.UserDto;
 import com.backend.service.FileService;
 import com.backend.service.UserService;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -160,7 +162,38 @@ public class UserControllerTest {
     }
 
     @Test
-    public void getAllUserTest() {
+    public void getAllUserTest() throws Exception {
+        User user = User.builder()
+                .email("rahul@gmail.com")
+                .name("Rahul")
+                .about("Mechanical")
+                .gender("Male")
+                .password("12333")
+                .imageName("rahul.png")
+                .build();
+        User user1 = User.builder()
+                .email("pawan@gmail.com")
+                .name("Pawan")
+                .about("Mechanical")
+                .gender("Male")
+                .password("12333")
+                .imageName("pawan.png")
+                .build();
+
+
+        List<User> users = Arrays.asList(user, user1);
+        List<UserDto> userDtos = users.stream().map(user2 -> this.modelMapper.map(users, UserDto.class)).collect(Collectors.toList());
+        PagableResponce pagableResponce = new PagableResponce();
+        Mockito.when(userService.getAll(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString())).thenReturn(pagableResponce);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/getAllUser/")
+                        .param("pageNumber", "1")
+                        .param("pageSize", "10")
+                        .param("sortDir", "asc")
+                        .param("sortBy", "name")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
     }
 
@@ -243,7 +276,7 @@ public class UserControllerTest {
 
         byte[] imageData = "Test image data".getBytes();
         InputStream inputStream = new ByteArrayInputStream(imageData);
-       Mockito.when(fileService.getResource(imageUploadPath,imageName)).thenReturn(inputStream);
+        Mockito.when(fileService.getResource(imageUploadPath, imageName)).thenReturn(inputStream);
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/user/image/{userId}", userId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.IMAGE_JPEG_VALUE))
@@ -254,7 +287,7 @@ public class UserControllerTest {
         assertEquals(MediaType.IMAGE_JPEG_VALUE, response.getContentType());
         assertArrayEquals(imageData, response.getContentAsByteArray());
     }
-    }
+}
 
 
 
