@@ -160,7 +160,7 @@ public class ProductControllerTest {
     public void deleteProductTest() throws Exception {
         String productId = "123";
         ApiResponceMessage apiResponceMessage = ApiResponceMessage.builder().message("Product Delete Successfully").success(true).build();
-        Mockito.doNothing().when(productService).delete(productId);
+        Mockito.doNothing().when(productService).deleteProduct(productId);
         mockMvc.perform(MockMvcRequestBuilders.delete("/products/deleteProduct/" + productId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -267,7 +267,7 @@ public class ProductControllerTest {
         Mockito.when(fileService.getResource(path, image)).thenReturn(inputStream);
 
 
-         mockMvc.perform(MockMvcRequestBuilders.get("/products/image/{productId}", productId))
+        mockMvc.perform(MockMvcRequestBuilders.get("/products/image/{productId}", productId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.IMAGE_JPEG_VALUE))
                 .andExpect(content().bytes(imageData))
@@ -275,5 +275,45 @@ public class ProductControllerTest {
                 .getResponse();
 
         assertEquals(MediaType.IMAGE_JPEG_VALUE, content().contentType(MediaType.IMAGE_JPEG));
+    }
+
+    @Test
+    public void getAllOfCategoriesTest() throws Exception {
+
+        String categoryId = "123";
+        Product product1 = Product.builder()
+                .productImageName("Chair")
+                .price(20002)
+                .description("Plastic table")
+                .quantity(30)
+                .title("Furniture")
+                .discountPrice(100)
+                .build();
+        Product product2 = Product.builder()
+                .productImageName("Chair")
+                .price(20002)
+                .description("Plastic table")
+                .quantity(30)
+                .title("Furniture")
+                .discountPrice(100)
+                .build();
+
+        List<Product> products = Arrays.asList(product2, product1, product);
+
+        List<ProductDto> productDtos = products.stream().map(product -> this.modelMapper.map(products, ProductDto.class)).collect(Collectors.toList());
+        PagableResponce<ProductDto> pagableResponce = new PagableResponce<>();
+
+        Mockito.when(productService.getAllOfCategories(Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString())).thenReturn(pagableResponce);
+
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/products/getAllOfCategories/{categoryId}/products/",categoryId,categoryId)
+                        .param("pageNumber", "1")
+                        .param("pageSize", "10")
+                        .param("sortDir", "asc")
+                        .param("sortBy", "name")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
     }
 }
