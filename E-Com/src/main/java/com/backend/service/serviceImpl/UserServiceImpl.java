@@ -39,23 +39,39 @@ public class UserServiceImpl implements UserService {
     @Value("${user.image}")
     private String imagePath;
 
+
+    /**
+     * Create the User by providing User specific details
+     * Generate the random UserId.
+     *
+     * @param userDto
+     * @return http status for save data
+     * @apiNote This Api is used to create new user in databased
+     */
+
     @Override
     public UserDto createUser(UserDto userDto) {
 
         String userId = UUID.randomUUID().toString();
-        logger.info("Generated the random userId");
+        logger.info("Generated the random userId :{}", userId);
         userDto.setUserId(userId);
         User dtoToUser = this.dtoToUser(userDto);
         User saveUser = this.userRepo.save(dtoToUser);
-
-
         return this.userToDto(saveUser);
     }
 
+    /**
+     * Update the User by providing the user parameter and UserId
+     *
+     * @param userDto
+     * @param userId  for upadate the user.
+     * @return userDto
+     * @apiNote This Api is used to update user data with id in  database
+     */
     @Override
     public UserDto updateUser(UserDto userDto, String userId) {
         User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("UserId Not Found !!"));
-
+        logger.info("Update the User with userDto and userId :{}", userId, userDto);
         user.setAbout(userDto.getAbout());
         user.setName(userDto.getName());
         user.setEmail(userDto.getEmail());
@@ -67,8 +83,16 @@ public class UserServiceImpl implements UserService {
         //  return this.modelMapper.map(updateUser, UserDto.class);
 
         UserDto updateDto = userToDto(updateUser);
+        logger.info("Update User:{}", updateDto);
         return updateDto;
     }
+
+    /**
+     * Delete the User by providing the userId
+     * *@param userId  provide the unique userId for delete user.
+     *
+     * @apiNote This Api is used to delete user data with id in  database
+     */
 
     @Override
     public void deleteUser(String userId) {
@@ -90,6 +114,15 @@ public class UserServiceImpl implements UserService {
         logger.info("User Delete Successfully");
     }
 
+
+    /**
+     * Retrive the PagableResponce by providing the spicific parameter
+     * Retrive All the data of User.
+     *
+     * @return http status for getting data
+     * @paramuserDto used to get to data
+     * @apiNote To get all user data from database
+     */
     @Override
     public PagableResponce<UserDto> getAll(int pageNumber, int pageSize, String sortBy, String sortDir) {
 
@@ -106,31 +139,60 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    /**
+     * Retrive the User by provide userId.
+     *
+     * @param id id
+     * @return http status for get single data from database
+     * * @param userDto UserDto Object
+     * @apiNote To get single user data from database using id
+     */
     @Override
     public UserDto getUserById(String userId) throws Exception {
         User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("UserId not Found "));
+        logger.info("Fetch the User by userId:{}", user.getUserId());
         return userToDto(user);
 
     }
+
+    /**
+     * Searches for users based on a keyword in their names.
+     *
+     * @param Keyword The keyword to search for in user names.
+     * @return A list of data transfer objects representing the matched users.
+     */
 
     @Override
     public List<UserDto> searchUser(String Keyword) {
         List<User> users = userRepo.findByNameContaining(Keyword);
-
+        logger.info("Fetching  User with Keyword :{}", users);
         List<UserDto> dtoList = users.stream().map(user -> userToDto(user)).collect(Collectors.toList());
         return dtoList;
     }
 
+    /**
+     * @param email
+     * @return userDto UserDto
+     * @apiNote This Api is used to get user data with email from database
+     */
     @Override
     public UserDto getUserByEmail(String email) {
         User user = userRepo.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Email Not Found"));
-
+        logger.info("Fetch the User with email :{}", user.getEmail());
         return userToDto(user);
     }
 
+
+    /**
+     * Converts a UserDto object to a User entity.
+     *
+     * @param userDto
+     * @return User.
+     */
+
     public User dtoToUser(UserDto userDto) {
         // User user = this.modelMapper.map(userDto, User.class);
-
+//
 //        User user = new User();
 //        user.setUserId(userDto.getUserId());
 //        user.setName(userDto.getName());
@@ -140,10 +202,10 @@ public class UserServiceImpl implements UserService {
 //        user.setImageName(userDto.getImageName());
 //        user.setPassword(userDto.getPassword());
 //        return user;
-//by using modelmapper
+//        by using modelmapper
         return modelMapper.map(userDto, User.class);
-
-// second method used to conver the userDto to user;
+//
+//        second method used to conver the userDto to user;
 //        User user = user.builder().
 //                email(userDto.getEmail())
 //                .about(userDto.getAbout())
@@ -156,6 +218,13 @@ public class UserServiceImpl implements UserService {
 //        return user;
 
     }
+
+    /**
+     * Converts a User entity to a UserDto object.
+     *
+     * @param user
+     * @return UserDto
+     */
 
     public UserDto userToDto(User user) {
         //UserDto userDto = this.modelMapper.map(user, UserDto.class);
