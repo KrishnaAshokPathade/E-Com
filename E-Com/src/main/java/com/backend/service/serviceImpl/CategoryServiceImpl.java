@@ -93,10 +93,9 @@ public class CategoryServiceImpl implements CategorySevice {
 
 
     /**
-     * Retrive All Category.
+     * Retrieves a list of all cateogory.
      *
-     * @return List<CategoryDto>
-     * @apiNote To get all Category data from database
+     * @return A list of CategoryDto objects representing all cateogrys.
      */
 
     @Override

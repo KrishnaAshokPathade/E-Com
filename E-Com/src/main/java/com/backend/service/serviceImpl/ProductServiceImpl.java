@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +38,15 @@ public class ProductServiceImpl implements ProductService {
     @Value("${product.image}")
     private String imagePath;
 
+
+    /**
+     * Create the Product providing Product specific details
+     * Generate the random productId.
+     *
+     * @param productDto
+     * @return http status for save data
+     * @apiNote This Api is used to create new product in databased
+     */
     @Override
     public ProductDto createProduct(ProductDto productDto) {
         String productId = UUID.randomUUID().toString();
@@ -47,6 +57,15 @@ public class ProductServiceImpl implements ProductService {
         logger.info("New Product Created: {}", createProduct);
         return this.modelMapper.map(createProduct, ProductDto.class);
     }
+
+    /**
+     * Update the Product by providing the product parameter and productId
+     *
+     * @param productDto
+     * @param productId
+     * @return userDto
+     * @apiNote This Api is used to update product data with productId in  database
+     */
 
     @Override
     public ProductDto updateProduct(ProductDto productDto, String productId) {
@@ -64,6 +83,12 @@ public class ProductServiceImpl implements ProductService {
         return this.modelMapper.map(updateProduct, ProductDto.class);
     }
 
+    /**
+     * Retrieves a list of all products.
+     *
+     * @return A list of ProductDto objects representing all products.
+     */
+
     @Override
     public List<ProductDto> getAllProduct() {
         List<Product> product1 = this.productRepo.findAll();
@@ -73,12 +98,27 @@ public class ProductServiceImpl implements ProductService {
         return collect;
     }
 
+    /**
+     * Retrieve the Product by provide productId.
+     *
+     * @param productId
+     * @return ProductDto  The http status for get single data from database
+     * @apiNote To get single Product data from database using producId
+     */
+
     @Override
     public ProductDto getSingleProduct(String productId) {
         Product product = this.productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("ProductId Not Found for get Single Product"));
         logger.info("Fetching the Single Product:{}", product.getProductId());
         return this.modelMapper.map(product, ProductDto.class);
     }
+
+    /**
+     * Retrieves a list of products that contain the specified title.
+     *
+     * @param subTitle The substring to search for in product titles.
+     * @return A list of ProductDto objects representing products with titles containing the specified substring.
+     */
 
     @Override
     public List<ProductDto> searchByTitle(String subTitle) {
@@ -88,14 +128,34 @@ public class ProductServiceImpl implements ProductService {
         return productDtos;
     }
 
+    /**
+     * Delete the Product by providing the productId
+     * *@param productId  provide the unique productId for delete Product.
+     *
+     * @apiNote This Api is used to delete Product data with productId in  database
+     */
+
     @Override
-    public void delete(String productId) {
+    public ResponseEntity<?> deleteProduct(String productId) {
         Product product = this.productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("ProductId Not Found"));
         logger.info("Delete the Product:{}", product.getProductId());
         this.productRepo.delete(product);
 
+        return ResponseEntity.ok("Delete Product Successfully");
     }
 
+
+    /**
+     * Retrieve the PagableResponce of Product by providing the specific parameter
+     * Retrieve All the data of Product.
+     *
+     * @param pageNumber
+     * @param pageSize
+     * @param sortBy
+     * @param sortDir
+     * @return http status for getting data
+     * @apiNote To get all user data from database
+     */
     @Override
     public PagableResponce<ProductDto> getAllByPageble(int pageNumber, int pageSize, String sortBy, String sortDir) {
         Sort sort = (sortDir.equalsIgnoreCase("desc")) ? (Sort.by(sortBy).descending()) : (Sort.by(sortBy).ascending());
@@ -107,8 +167,17 @@ public class ProductServiceImpl implements ProductService {
         return pagebleResponce;
     }
 
+    /**
+     * Create the Product providing Product specific details and categoryId
+     *
+     * @param productDto
+     * @param  categoryId
+     * @return  productDto The http status for save data
+     * @apiNote This Api is used to create new product using categoryId in databased
+     */
+
     @Override
-    public ProductDto createWithCategory(ProductDto productDto, String categoryId) {
+    public ProductDto createProductWithCategory(ProductDto productDto, String categoryId) {
         Category category = this.categoryRepo.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("CategoryId Not Found"));
         logger.info("Fetching the category :{}", category);
         Product product = modelMapper.map(productDto, Product.class);
@@ -121,16 +190,47 @@ public class ProductServiceImpl implements ProductService {
         logger.info("Create Product with Category ,{}", dto);
         return dto;
     }
+    /**
+     * Update  the Product providing productId  and categoryId
+     *
+     * @param productId
+     * @param  categoryId
+     * @return  productDto The http status for save data
+     * @apiNote This Api is used to update product using categoryId  and productId in databased
+     */
 
     @Override
-    public ProductDto updateCategory(String productId, String categoryId) {
+    public ProductDto updateCategoryOfProduct(String productId, String categoryId) {
         Product product = this.productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("ProductId not Found for updateCategory"));
-        logger.info("Update the Product with category :{}", product.getProductId());
+        logger.info("Fetch the Product with ProductId :{}", product.getProductId());
         Category category = this.categoryRepo.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("CategoryId not Found for updateCategory !!"));
-        logger.info("Update the Product with category :{}", category.getCategoryId());
+        logger.info("Fetch the Category with categoryId :{}", category.getCategoryId());
         product.setCategory(category);
         Product saveProduct = this.productRepo.save(product);
         logger.info("Update the product :{}", saveProduct);
         return modelMapper.map(product, ProductDto.class);
+    }
+    /**
+     * Retrieve the PagableResponce by providing the specific parameter
+     * Retrive All the data of Category.
+     *
+     * @param pageNumber
+     * @param pageSize
+     * @param sortBy
+     * @param sortDir
+     * @param  categoryId
+     * @return List of PagableResponce with productDto
+     * @apiNote To get all product data with Pagable Responce from database
+     */
+
+    @Override
+    public PagableResponce<ProductDto> getAllOfCategories(String categoryId, int pageSize, int pageNumber, String sortBy, String sortDir) {
+
+        Category category = this.categoryRepo.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("CategoryID Not Found"));
+        Sort sort = (sortDir.equalsIgnoreCase("desc")) ? (Sort.by(sortBy).descending()) : (Sort.by(sortBy).ascending());
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Page<Product> page = this.productRepo.findByCategory(category, pageable);
+        logger.info("Fetching all Page ,{}",page.getTotalPages());
+        return Helper.getPagebleResponce(page, ProductDto.class);
     }
 }
