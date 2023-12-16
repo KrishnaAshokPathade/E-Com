@@ -31,6 +31,15 @@ public class CategoryServiceImpl implements CategorySevice {
     @Autowired
     private ModelMapper modelMapper;
 
+
+    /**
+     * Create the Category providing Category specific details
+     * Generate the random categoryId.
+     *
+     * @param categoryDto
+     * @return http status for save data
+     * @apiNote This Api is used to create new category in databased
+     */
     @Override
     public CategoryDto createCategory(CategoryDto categoryDto) {
         String categoryId = UUID.randomUUID().toString();
@@ -40,10 +49,19 @@ public class CategoryServiceImpl implements CategorySevice {
         Category category = this.modelMapper.map(categoryDto, Category.class);
         Category saveCategory = categoryRepo.save(category);
 
-        logger.info("Successfully category created :{}", saveCategory);
+        logger.info("New category created :{}", saveCategory);
         return this.modelMapper.map(saveCategory, CategoryDto.class);
     }
 
+
+    /**
+     * Update the Category by providing the category parameter and categoryId
+     *
+     * @param categoryDto
+     * @param categoryId
+     * @return categoryDto
+     * @apiNote This Api is used to update Category data with id in  database
+     */
     @Override
     public CategoryDto updateCategory(CategoryDto categoryDto, String categoryId) {
         Category category = this.categoryRepo.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category Not Found !!"));
@@ -57,6 +75,13 @@ public class CategoryServiceImpl implements CategorySevice {
         return this.modelMapper.map(updateCategory, CategoryDto.class);
     }
 
+
+    /**
+     * Delete the Category by providing the categoryId
+     * *@param categoryId  provide the unique categoryId for delete user.
+     *
+     * @apiNote This Api is used to delete Category data with categoryId in  database
+     */
     @Override
     public void deleteCategory(String categoryId) {
         Category category = this.categoryRepo.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("CategoryId Not Found !!"));
@@ -65,6 +90,14 @@ public class CategoryServiceImpl implements CategorySevice {
         logger.info("Delete the category:{}", category.getCategoryId());
 
     }
+
+
+    /**
+     * Retrive All Category.
+     *
+     * @return List<CategoryDto>
+     * @apiNote To get all Category data from database
+     */
 
     @Override
     public List<CategoryDto> getAllCategory() {
@@ -75,6 +108,14 @@ public class CategoryServiceImpl implements CategorySevice {
         return categoryDtos;
     }
 
+
+    /**
+     * Retrieve the Category by provide categoryId.
+     *
+     * @param categoryId
+     * @return CategoryDto http status for get single data from database
+     * @apiNote To get single Category data from database using categoryId
+     */
     @Override
     public CategoryDto getSingleCategory(String categoryId) {
         Category category = this.categoryRepo.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("CategoryId npot Found !!"));
@@ -84,6 +125,17 @@ public class CategoryServiceImpl implements CategorySevice {
         return categoryDto;
     }
 
+    /**
+     * Retrive the PagableResponce by providing the spicific parameter
+     * Retrive All the data of Category.
+     *
+     * @param pageNumber
+     * @param pageSize
+     * @param sortBy
+     * @param sortDir
+     * @return http status for getting data
+     * @apiNote To get all user data from database
+     */
     @Override
     public PagableResponce<CategoryDto> getAllByPageble(int pageNumber, int pageSize, String sortBy, String sortDir) {
         Sort sort = (sortDir.equalsIgnoreCase("desc")) ? (Sort.by(sortBy).descending()) : (Sort.by(sortBy).ascending());
