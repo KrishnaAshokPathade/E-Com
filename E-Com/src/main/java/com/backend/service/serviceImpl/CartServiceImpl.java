@@ -41,17 +41,17 @@ public class CartServiceImpl implements CartService {
     private CartRepo cartRepository;
 
     @Override
-    public CartDto addItemToCart(String id, AddItemToCartRequest request) {
+    public CartDto addItemToCart(String userId, AddItemToCartRequest request) {
 
         int quantity = request.getQuantity();
 
-        String productId = String.valueOf(request.getProductId());
+        String productId = request.getProductId();
 
         if (quantity <= 0) {
             throw new BadApiRequest(AppConstant.INVALIDE_QUANTITY);
         }
         Product product = productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product Not Found"));
-        User user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+        User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
         Cart cart = null;
         try {
             cart = cartRepository.findByUser(user).get();
@@ -61,7 +61,6 @@ public class CartServiceImpl implements CartService {
             cart.setCartId(UUID.randomUUID().toString());
             cart.setCreatedAt(new Date());
         }
-
 
         AtomicReference<Boolean> update = new AtomicReference(false);
         List<CartItem> items = cart.getItems();
@@ -78,27 +77,39 @@ public class CartServiceImpl implements CartService {
 
 
         if (!update.get()) {
-            CartItem cartItem = CartItem.builder().cart(cart).totalPrice(quantity + product.getPrice()).quantity(quantity).product(product).build();
+            CartItem cartItem = CartItem.builder().
+                    cart(cart).
+                    totalPrice(quantity + product.getPrice()).
+                    quantity(quantity).
+                    product(product).
+                    build();
             cart.getItems().add(cartItem);
         }
         cart.setUser(user);
         Cart updateCart = cartRepository.save(cart);
         return this.modelMapper.map(updateCart, CartDto.class);
+
     }
 
     @Override
-    public void removeItemFromCart(String id, int cartItem) {
+    public void removeItemFromCart(String userId, int cartItem) {
         CartItem cartItem1 = cartItemRepo.findById(cartItem).orElseThrow(() -> new ResourceNotFoundException("Cart Not Found"));
         cartItemRepo.delete(cartItem1);
     }
+
     @Override
-    public void clearCart(String id) {
+    public void clearCart(String userId) {
 
-        User user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+        User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
         Cart cart = cartRepository.findByUser(user).orElseThrow(() -> new ResourceNotFoundException("Cart Not Found"));
-
         cart.getItems().clear();
-
         cartRepository.save(cart);
+    }
+
+    @Override
+    public CartDto getCartByUser(String userId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+        Cart cart = cartRepository.findByUser(user).orElseThrow(() -> new ResourceNotFoundException("Cart Not Found"));
+        return this.modelMapper.map(cart, CartDto.class);
     }
 }
