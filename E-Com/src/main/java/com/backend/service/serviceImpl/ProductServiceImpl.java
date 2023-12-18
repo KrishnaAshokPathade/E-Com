@@ -136,12 +136,11 @@ public class ProductServiceImpl implements ProductService {
      */
 
     @Override
-    public ResponseEntity<?> deleteProduct(String productId) {
+    public void deleteProduct(String productId) {
         Product product = this.productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("ProductId Not Found"));
         logger.info("Delete the Product:{}", product.getProductId());
         this.productRepo.delete(product);
 
-        return ResponseEntity.ok("Delete Product Successfully");
     }
 
 
