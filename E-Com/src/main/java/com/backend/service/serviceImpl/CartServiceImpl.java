@@ -9,6 +9,7 @@ import com.backend.model.Product;
 import com.backend.model.User;
 import com.backend.payload.AddItemToCartRequest;
 import com.backend.payload.CartDto;
+
 import com.backend.repository.CartItemRepo;
 import com.backend.repository.CartRepo;
 import com.backend.repository.ProductRepo;
@@ -16,6 +17,8 @@ import com.backend.repository.UserRepo;
 import com.backend.service.CartService;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class CartServiceImpl implements CartService {
+    private Logger logger = LoggerFactory.getLogger(CartServiceImpl.class);
     @Autowired
     private CartItemRepo cartItemRepo;
     @Autowired
@@ -42,6 +46,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartDto addItemToCart(String userId, AddItemToCartRequest request) {
+
 
         int quantity = request.getQuantity();
 
@@ -60,6 +65,7 @@ public class CartServiceImpl implements CartService {
             cart = new Cart();
             cart.setCartId(UUID.randomUUID().toString());
             cart.setCreatedAt(new Date());
+            logger.info("Save the Cart Details:{}", cart);
         }
 
         AtomicReference<Boolean> update = new AtomicReference(false);
@@ -75,26 +81,26 @@ public class CartServiceImpl implements CartService {
         }).collect(Collectors.toList());
         cart.setItems(items);
 
-
         if (!update.get()) {
-            CartItem cartItem = CartItem.builder().
-                    cart(cart).
+            CartItem cartItem = CartItem.builder().cart(cart).
                     totalPrice(quantity + product.getPrice()).
-                    quantity(quantity).
-                    product(product).
-                    build();
+                    quantity(quantity).product(product)
+                    .build();
             cart.getItems().add(cartItem);
         }
-        cart.setUser(user);
+
         Cart updateCart = cartRepository.save(cart);
+        logger.info("Update the cart Details:{}", updateCart);
         return this.modelMapper.map(updateCart, CartDto.class);
 
     }
 
     @Override
-    public void removeItemFromCart(String userId, int cartItem) {
-        CartItem cartItem1 = cartItemRepo.findById(cartItem).orElseThrow(() -> new ResourceNotFoundException("Cart Not Found"));
+    public void removeItemFromCart(String userId, int cartItemId) {
+        CartItem cartItem1 = cartItemRepo.findById(cartItemId).orElseThrow(() -> new ResourceNotFoundException("Cart Not Found"));
+        logger.info("Remove the Item from Cart with cartItem :{}", cartItem1.getCartItemId());
         cartItemRepo.delete(cartItem1);
+        logger.info("Remove the Item from cart");
     }
 
     @Override
@@ -103,13 +109,16 @@ public class CartServiceImpl implements CartService {
         User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
         Cart cart = cartRepository.findByUser(user).orElseThrow(() -> new ResourceNotFoundException("Cart Not Found"));
         cart.getItems().clear();
+        logger.info("Clear the cart with userId,{}",user.getUserId());
         cartRepository.save(cart);
     }
 
     @Override
     public CartDto getCartByUser(String userId) {
         User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+        logger.info("Fetch the User with userId :{}",user.getUserId());
         Cart cart = cartRepository.findByUser(user).orElseThrow(() -> new ResourceNotFoundException("Cart Not Found"));
+        logger.info("Fetch the Cart with user :{}",user);
         return this.modelMapper.map(cart, CartDto.class);
     }
 }
