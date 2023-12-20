@@ -15,11 +15,9 @@ import java.util.List;
 public class CreateOrderRequest {
     private String cartId;
     private String userId;
-
     private String orderStatus = "Pending";
 
     private String paymentStatus = "Not_Paid";
-
 
     private String billingAddress;
 
