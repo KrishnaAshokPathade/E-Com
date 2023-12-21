@@ -12,6 +12,8 @@ import com.backend.repository.UserRepo;
 import com.backend.service.OrderService;
 import com.backend.utitlity.Helper;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
+
+    private Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
     @Autowired
     private UserRepo userRepo;
     @Autowired
@@ -52,8 +56,15 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Order order = Order.builder().
-                orderId("123").billingName(orderDto.getBillingName()).billingAddress(orderDto.getBillingAddress()).orderDate(new Date()).orderStatus(orderDto.getOrderStatus()).billingPhone(orderDto.getBillingPhone()).paymentStatus(orderDto.getPaymentStatus()).deliverDate(null).orderId(UUID.randomUUID().toString()).user(user).build();
-
+                billingName(orderDto.getBillingName()).
+                billingAddress(orderDto.getBillingAddress()).
+                orderDate(new Date()).orderStatus(orderDto.getOrderStatus()).
+                billingPhone(orderDto.getBillingPhone()).
+                paymentStatus(orderDto.getPaymentStatus()).
+                deliverDate(null).
+                user(user).
+                orderId(UUID.randomUUID().toString()).build();
+        logger.info("create the order :{}", order);
 
         AtomicReference<Integer> orderAmount = new AtomicReference<>(0);
         List<OrderItem> orderItems = cartItems.stream().map(cartItem -> {
@@ -66,11 +77,12 @@ public class OrderServiceImpl implements OrderService {
         }).collect(Collectors.toList());
         order.setOrderAmount(order.getOrderAmount());
         order.setOrderItemList(orderItems);
-        cart.getItems().clear();
 
+        cart.getItems().clear();
 
         cartRepo.save(cart);
         Order saveOrder = orderRepo.save(order);
+        logger.info("Order created", saveOrder);
         return modelMapper.map(saveOrder, OrderDto.class);
     }
 
@@ -78,7 +90,9 @@ public class OrderServiceImpl implements OrderService {
     public void removeOrder(String orderId) {
 
         Order order = orderRepo.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order Not Found !!"));
+        logger.info("Fetching single Order:{}", order.getOrderId());
         orderRepo.delete(order);
+        logger.info("Order Deleted");
 
     }
 
@@ -86,16 +100,19 @@ public class OrderServiceImpl implements OrderService {
     public OrderDto getOrdersOfUser(String userId) {
 
         User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
-        List<Order> orderList = orderRepo.findByUser(user);
-        List<OrderDto> orderDtos = orderList.stream().map(order -> this.modelMapper.map(orderList, OrderDto.class)).collect(Collectors.toList());
-        return (OrderDto) orderDtos;
+        logger.info("Fetch single user with userId:{}", userId);
+        Order order = orderRepo.findByUser(user);
+        logger.info("Fetch the order with user:{}", order);
+        return this.modelMapper.map(order, OrderDto.class);
     }
 
     @Override
     public PagableResponce<OrderDto> getAllByPageble(int pageNumber, int pageSize, String sortBy, String sortDir) {
+
         Sort sort = (sortDir.equalsIgnoreCase("desc")) ? (Sort.by(sortBy).descending()) : (Sort.by(sortBy).ascending());
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         Page<Order> page = orderRepo.findAll(pageable);
+        logger.info("Fetching all Page ,{}",page.getTotalPages());
         return Helper.getPagebleResponce(page, OrderDto.class);
     }
 }
