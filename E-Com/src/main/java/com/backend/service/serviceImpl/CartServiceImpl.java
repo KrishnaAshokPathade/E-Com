@@ -10,6 +10,7 @@ import com.backend.model.User;
 import com.backend.payload.AddItemToCartRequest;
 import com.backend.payload.CartDto;
 
+import com.backend.payload.UserDto;
 import com.backend.repository.CartItemRepo;
 import com.backend.repository.CartRepo;
 import com.backend.repository.ProductRepo;
@@ -44,6 +45,14 @@ public class CartServiceImpl implements CartService {
     @Autowired
     private CartRepo cartRepository;
 
+
+
+    /**
+     * @param userId
+     * @param request
+     * @return cartDto
+     * @apiNote This Api is used to add item in Cart in databased
+     */
     @Override
     public CartDto addItemToCart(String userId, AddItemToCartRequest request) {
 
@@ -65,6 +74,9 @@ public class CartServiceImpl implements CartService {
             cart = new Cart();
             cart.setCartId(UUID.randomUUID().toString());
             cart.setCreatedAt(new Date());
+            cart.setUser(user);
+
+
             logger.info("Save the Cart Details:{}", cart);
         }
 
@@ -79,7 +91,7 @@ public class CartServiceImpl implements CartService {
             return items;
 
         }).collect(Collectors.toList());
-        cart.setItems(items);
+      //  cart.setItems(items);
 
         if (!update.get()) {
             CartItem cartItem = CartItem.builder().cart(cart).
@@ -92,33 +104,50 @@ public class CartServiceImpl implements CartService {
         Cart updateCart = cartRepository.save(cart);
         logger.info("Update the cart Details:{}", updateCart);
         return this.modelMapper.map(updateCart, CartDto.class);
-
     }
 
+    /**
+     * Remove the item  by providing the cartItemId
+     * *@param cartItemId
+     * @param  userId
+     * @apiNote This Api is used to remove item from cart
+     */
     @Override
     public void removeItemFromCart(String userId, int cartItemId) {
         CartItem cartItem1 = cartItemRepo.findById(cartItemId).orElseThrow(() -> new ResourceNotFoundException("Cart Not Found"));
         logger.info("Remove the Item from Cart with cartItem :{}", cartItem1.getCartItemId());
         cartItemRepo.delete(cartItem1);
-        logger.info("Remove the Item from cart");
+        logger.info("Remove Item from cart");
     }
 
+    /**
+     * Clear the cart  by providing the userId
+     * *@param userId
+     * @apiNote This Api is used to clear the cart  from the database.
+     */
     @Override
     public void clearCart(String userId) {
 
         User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
         Cart cart = cartRepository.findByUser(user).orElseThrow(() -> new ResourceNotFoundException("Cart Not Found"));
         cart.getItems().clear();
-        logger.info("Clear the cart with userId,{}",user.getUserId());
+        logger.info("Clear the cart with userId,{}", user.getUserId());
         cartRepository.save(cart);
     }
 
+    /**
+     * Retrieve the Cart by provide userId.
+     *
+     * @param userId
+     * @return CartDto  Retrive the single data from database.
+     * @apiNote To get single cart data from database using userId
+     */
     @Override
     public CartDto getCartByUser(String userId) {
         User user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
-        logger.info("Fetch the User with userId :{}",user.getUserId());
+        logger.info("Fetch the User with userId :{}", user.getUserId());
         Cart cart = cartRepository.findByUser(user).orElseThrow(() -> new ResourceNotFoundException("Cart Not Found"));
-        logger.info("Fetch the Cart with user :{}",user);
+        logger.info("Fetch the Cart with user :{}", user);
         return this.modelMapper.map(cart, CartDto.class);
     }
 }
