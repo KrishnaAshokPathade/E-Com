@@ -40,6 +40,13 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private CartRepo cartRepo;
 
+
+
+    /**
+     * @param orderDto
+     * @return orderDto
+     * @apiNote This Api is used create new order in databased
+     */
     @Override
     public OrderDto createOrder(CreateOrderRequest orderDto) {
 
@@ -86,6 +93,11 @@ public class OrderServiceImpl implements OrderService {
         return modelMapper.map(saveOrder, OrderDto.class);
     }
 
+    /**
+     * @param orderId
+     * @apiNote This Api is used to remove the Order from database
+     */
+
     @Override
     public void removeOrder(String orderId) {
 
@@ -96,6 +108,12 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
+
+    /**
+     * @param userId
+     * @return OrderDto
+     * @apiNote This Api is used to get the Order from databased
+     */
     @Override
     public OrderDto getOrdersOfUser(String userId) {
 
@@ -106,6 +124,18 @@ public class OrderServiceImpl implements OrderService {
         return this.modelMapper.map(order, OrderDto.class);
     }
 
+
+    /**
+     * Retrive the PagableResponce by providing the specific parameter
+     * Retrive All the data of Category.
+     *
+     * @param pageNumber
+     * @param pageSize
+     * @param sortBy
+     * @param sortDir
+     * @return  Return http status for getting data
+     * @apiNote To get all user data from database
+     */
     @Override
     public PagableResponce<OrderDto> getAllByPageble(int pageNumber, int pageSize, String sortBy, String sortDir) {
 
